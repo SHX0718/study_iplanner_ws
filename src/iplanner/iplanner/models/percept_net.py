@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch
 
 def conv1x1(in_planes, out_planes, stride=1):
     """1x1 convolution"""
@@ -66,7 +67,7 @@ class PerceptNet(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=self.in_planes, kernel_size=7, stride=2, padding=3, bias=False)
         # self.bn1 = norm_layer(self.in_planes) 原项目省略
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2. padding=1)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         # 堆叠残差层
         self.layer1 = self._make_layer(block, 64, layers[0])
@@ -114,3 +115,25 @@ class PerceptNet(nn.Module):
         x = self.layer4(x)
 
         return x
+    
+# # 测试代码
+# if __name__ == "__main__":
+#     # 1. 实例化网络 (模拟 ResNet18 的层数设置 [2, 2, 2, 2])
+#     model = PerceptNet(layers=[2, 2, 2, 2])
+    
+#     # 2. 创建一个伪造的输入数据 
+#     # (Batch_Size=1, Channel=3, Height=224, Width=224)
+#     dummy_input = torch.randn(1, 3, 224, 224)
+    
+#     # 3. 前向传播
+#     output = model(dummy_input)
+    
+#     # 4. 打印结果
+#     print(f"Input shape: {dummy_input.shape}")
+#     print(f"Output shape: {output.shape}")
+    
+#     # 预期输出: 
+#     # 因为经过了5次下采样 (conv1 + 4个layer各一次stride=2)
+#     # 224 / 2^5 = 224 / 32 = 7
+#     # 通道数在 layer4 变成了 512
+#     # 所以预期是: [1, 512, 7, 7]
